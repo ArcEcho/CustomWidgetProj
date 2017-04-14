@@ -221,8 +221,6 @@ void SCustomImage::NotifyEnd()
         OnAnimationEnd.Execute();
     }
 
-      //TODO  Notify End
-    UE_LOG(MyLog, Log, TEXT("Should implement notify"));
 }
 
 
