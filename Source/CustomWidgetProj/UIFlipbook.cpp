@@ -22,14 +22,14 @@ UUIFlipbook::UUIFlipbook(const FObjectInitializer& ObjectInitializer)
 }
 
 
-void UUIFlipbook::PlayAnimation(bool ShouldLoop)
+void UUIFlipbook::PlayAnimation(bool ShouldLoop, bool InShouldNotifyAtEnd /*= false*/)
 {
     if (!MyImage.IsValid())
     {
         return;
     }
 
-    MyImage->PlayAnimation(ShouldLoop);
+    MyImage->PlayAnimation(ShouldLoop, InShouldNotifyAtEnd);
 }
 
 void UUIFlipbook::PauseAnimation()

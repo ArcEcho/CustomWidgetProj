@@ -29,7 +29,6 @@ public:
         , _ColumnCount(1)
         , _RowCount(1)
         , _CutFrameCount(0)
-        , _WrapperWidgetSize(FVector2D(100, 100))
     {}
 
     /** Color and opacity */
@@ -42,8 +41,6 @@ public:
         SLATE_ATTRIBUTE(float, LoopInterval)
         SLATE_ATTRIBUTE(int32, ColumnCount)
         SLATE_ATTRIBUTE(int32, RowCount)
-
-        SLATE_ATTRIBUTE(FVector2D, WrapperWidgetSize)
 
         /** Number of the blocking frames */
         SLATE_ATTRIBUTE(int32, CutFrameCount)
@@ -97,8 +94,6 @@ public:
 
     void SetImageRes(UTexture2D* InImageRes);
 
-    void SetWrapperWidgetSize(FVector2D InSize);
-
     /** See the ColorAndOpacity attribute */
     void SetColorAndOpacity(const TAttribute<FSlateColor>& InColorAndOpacity);
 
@@ -108,6 +103,8 @@ public:
 protected:
 
     void NotifyAnimationEnd();
+
+    void UpdateImageBrushUVRegion();
 
     float AccumulatedFrameTime;
     float AccumulatedLoopIntervalTime;
@@ -125,8 +122,6 @@ protected:
 
     /** Color and opacity scale for this image */
     TAttribute<FSlateColor> ColorAndOpacity;
-
-    FVector2D WrapperWidgetSize;
 
     float Duration;
     float LoopInterval;

@@ -3,13 +3,12 @@
 #pragma once
 
 #include "Components/Widget.h"
-#include "CustomImageWidget.h"
 #include "UIFlipbook.generated.h"
 
 class SUIFlipbookImage;
 class UTexture2D;
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnimationEndEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnimationEndEvent);
 
 /**
  *
@@ -64,7 +63,7 @@ public:
         FGetLinearColor ColorAndOpacityDelegate;          //This should be exist if you use a binding of the  ColorAndOpacity in SynchronizeProperies().
 
     UFUNCTION(BlueprintCallable, Category = "UIFlipbook")
-        void PlayAnimation(bool ShouldLoop);
+        void PlayAnimation(bool ShouldLoop, bool InShouldNotifyAtEnd = false);
 
     UFUNCTION(BlueprintCallable, Category = "UIFlipbook")
         void PauseAnimation();

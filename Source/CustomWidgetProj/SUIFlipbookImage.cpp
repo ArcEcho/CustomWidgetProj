@@ -29,8 +29,10 @@ void SUIFlipbookImage::Construct(const FArguments& InArgs)
     AccumulatedLoopIntervalTime = 0.0f;
     CachedFrameIndex = 0;
 
-    ImageBrush = FSlateBrush(*FCoreStyle::Get().GetDefaultBrush());
+    ImageBrush = FSlateBrush();
     ImageBrush.Tiling = ESlateBrushTileType::NoTile;  //This is very important
+
+    UpdateImageBrushUVRegion();
 }
 
 
@@ -39,43 +41,22 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 int32 SUIFlipbookImage::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
+    if (ImageBrush.DrawAs != ESlateBrushDrawType::NoDrawType) {
+        const bool bIsEnabled = ShouldBeEnabled(bParentEnabled);
+        const uint32 DrawEffects = bIsEnabled ? ESlateDrawEffect::None : ESlateDrawEffect::DisabledEffect;
 
-    const bool bIsEnabled = ShouldBeEnabled(bParentEnabled);
-    const uint32 DrawEffects = bIsEnabled ? ESlateDrawEffect::None : ESlateDrawEffect::DisabledEffect;
+        const FLinearColor FinalColorAndOpacity(InWidgetStyle.GetColorAndOpacityTint() * ColorAndOpacity.Get().GetColor(InWidgetStyle) * ImageBrush.GetTint(InWidgetStyle));
 
-    const FLinearColor FinalColorAndOpacity(InWidgetStyle.GetColorAndOpacityTint() * ColorAndOpacity.Get().GetColor(InWidgetStyle) * ImageBrush.GetTint(InWidgetStyle));
-
-    //Calculate offset and desired size
-    int32 CurrentRowIndex = CachedFrameIndex / ColumnCount;
-    int32 CurrentColounIndex = CachedFrameIndex % ColumnCount;
-
-    auto AdjustedSize = FVector2D(
-        AllottedGeometry.GetLocalSize().X * ColumnCount,
-        AllottedGeometry.GetLocalSize().Y * RowCount
-    );
-
-    auto AdjustedOffset = FVector2D(
-        -CurrentColounIndex * AllottedGeometry.GetLocalSize().X,
-        -CurrentRowIndex *AllottedGeometry.GetLocalSize().Y
-    );
-
-    auto PaintGeometry = AllottedGeometry.ToPaintGeometry(
-        AdjustedOffset,
-        AdjustedSize,
-        1
-    );
-
-    FSlateDrawElement::MakeBox(
-        OutDrawElements,
-        LayerId,
-        //AllottedGeometry.ToPaintGeometry(),
-        PaintGeometry,
-        &ImageBrush,
-        MyClippingRect,
-        ESlateDrawEffect::None,
-        FinalColorAndOpacity
-    );
-
+        FSlateDrawElement::MakeBox(
+            OutDrawElements,
+            LayerId,
+            AllottedGeometry.ToPaintGeometry(),
+            &ImageBrush,
+            MyClippingRect,
+            DrawEffects,
+            FinalColorAndOpacity
+        );
+    }
 
     return LayerId;
 }
@@ -134,27 +115,37 @@ void SUIFlipbookImage::Tick(const FGeometry& AllottedGeometry, const double InCu
     }
 
     CachedFrameIndex %= (RowCount * ColumnCount - CutFrameCount);
+
+    UpdateImageBrushUVRegion();
 }
 
 
 void SUIFlipbookImage::SetDuration(float InDuration)
 {
-    Duration = InDuration;
+    Duration = InDuration;     
+    
+    Invalidate(EInvalidateWidget::Layout);
 }
 
 void SUIFlipbookImage::SetLoopInterval(float InLoopInterval)
 {
     LoopInterval = InLoopInterval;
+
+    Invalidate(EInvalidateWidget::Layout);
 }
 
 void SUIFlipbookImage::SetColumnCount(int32 InColumnCount)
 {
     ColumnCount = InColumnCount;
+
+    Invalidate(EInvalidateWidget::Layout);
 }
 
 void SUIFlipbookImage::SetRowCount(int32 InRowCount)
 {
     RowCount = InRowCount;
+
+    Invalidate(EInvalidateWidget::Layout);
 }
 
 void SUIFlipbookImage::SetCutFrameCount(int32 InCutFrameCount)
@@ -167,6 +158,8 @@ void SUIFlipbookImage::SetCutFrameCount(int32 InCutFrameCount)
     {
         CutFrameCount = InCutFrameCount;
     }
+
+    Invalidate(EInvalidateWidget::Layout);
 }
 
 void SUIFlipbookImage::ResetAnimation()
@@ -177,6 +170,8 @@ void SUIFlipbookImage::ResetAnimation()
 
     AccumulatedLoopIntervalTime = 0.0f;
     bIsInLoopInterval = false;
+
+    UpdateImageBrushUVRegion();
 }
 
 
@@ -258,6 +253,8 @@ void SUIFlipbookImage::SetImageRes(UTexture2D* InImageRes)
     }
 
     Invalidate(EInvalidateWidget::Layout);
+
+    UpdateImageBrushUVRegion();
 }
 
 void SUIFlipbookImage::SetColorAndOpacity(const TAttribute<FSlateColor>& InColorAndOpacity)
@@ -286,4 +283,21 @@ void SUIFlipbookImage::NotifyAnimationEnd()
     }
 }
 
+void SUIFlipbookImage::UpdateImageBrushUVRegion()
+{
+    int32 CurrentRowIndex = CachedFrameIndex / ColumnCount;
+    int32 CurrentColumnIndex = CachedFrameIndex % ColumnCount;
+
+
+    FVector2D StartUV = FVector2D(
+        static_cast<float>(CurrentColumnIndex) / static_cast<float>(ColumnCount),
+        static_cast<float>(CurrentRowIndex) / static_cast<float>(RowCount)
+    );
+    FVector2D EndUV = FVector2D(
+        static_cast<float>(CurrentColumnIndex + 1) / static_cast<float>(ColumnCount),
+        static_cast<float>(CurrentRowIndex + 1) / static_cast<float>(RowCount)
+    );
+
+    ImageBrush.SetUVRegion(FBox2D(StartUV, EndUV));
+}
 
