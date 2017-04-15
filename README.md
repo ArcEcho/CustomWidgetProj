@@ -8,6 +8,9 @@ Features:
 + Implement the main logic in slate, and wrap it with UWidget, so it is easy to use in UMG.
 + Just implement an OnAnimationEnd delegate, you can use it like OnClicked of the button. 
 
+New:
++ Provide loop interval property.
++ Add auto play loop option.
 
 ####Important:
 > UE4 version: 4.15.1
