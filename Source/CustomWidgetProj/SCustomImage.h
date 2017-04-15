@@ -63,6 +63,7 @@ public:
     void StopAnimation(bool InShouldNotifyAtEnd = false);
 
     void SetOnAnimationEnd(FAnimationEndDelegate EventHandler);
+    void SetTex(UTexture2D* InTex);
 
 protected:
 
@@ -70,6 +71,8 @@ protected:
 
     float AccumulatedFrameTime;
     int32 CachedFrameIndex;
+
+    FSlateBrush MyBrush;
 
     float Duration;
     int32 ColumnCount;

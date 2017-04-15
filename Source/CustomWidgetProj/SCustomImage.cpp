@@ -28,6 +28,8 @@ void SCustomImage::Construct(const FArguments& InArgs)
     AccumulatedFrameTime = 0.0f;
     CachedFrameIndex = 0;
 
+    MyBrush = FSlateBrush();
+
     /*
     ChildSlot
     [
@@ -39,7 +41,8 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 int32 SCustomImage::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
-    const FSlateBrush* ImageBrush = Image.Get();
+    //const FSlateBrush* ImageBrush = Image.Get();
+    const FSlateBrush* ImageBrush = &MyBrush;
 
     if ((ImageBrush != nullptr) && (ImageBrush->DrawAs != ESlateBrushDrawType::NoDrawType))
     {
@@ -211,6 +214,15 @@ void SCustomImage::StopAnimation(bool ShouldNotifyEndEvent /* = false */)
 void SCustomImage::SetOnAnimationEnd(FAnimationEndDelegate EventHandler)
 {
     OnAnimationEnd = EventHandler;
+}
+
+void SCustomImage::SetTex(UTexture2D* InTex)
+{
+    if (InTex != nullptr)
+    {
+        InTex->bIgnoreStreamingMipBias = true;
+        MyBrush.SetResourceObject(InTex);
+    }
 }
 
 void SCustomImage::NotifyEnd()
