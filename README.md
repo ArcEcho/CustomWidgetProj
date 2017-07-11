@@ -12,5 +12,8 @@ New:
 + Provide loop interval property.
 + Add auto play loop option.
 
-####Important:
+#### Important:
 > UE4 version: 4.15.1
+
+#### Additional:
+[Some introduction](https://arcecho.github.io/2017/04/16/%E5%9C%A8UMG%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%B8%A7%E5%8A%A8%E7%94%BB-C-Slate-UMG/)
